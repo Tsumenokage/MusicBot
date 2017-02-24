@@ -720,7 +720,7 @@ class MusicBot(discord.Client):
         print()
         # t-t-th-th-that's all folks!
 
-    async def cmd_help(self, command=None):
+    async def cmd_help(self, author, channel, server, permissions, command=None):
         """
         Usage:
             {command_prefix}help [command]
@@ -733,15 +733,17 @@ class MusicBot(discord.Client):
         if command:
             cmd = getattr(self, 'cmd_' + command, None)
             if cmd:
-                return Response(
+                await self.send_message(
+		            author,
                     "```\n{}```".format(
                         dedent(cmd.__doc__),
                         command_prefix=self.config.command_prefix
-                    ),
-                    delete_after=60
+                    )
                 )
+                return Response(":mailbox_with_mail:", delete_after=10)
             else:
-                return Response("No such command", delete_after=10)
+                await self.send_message(author,"No such command")
+                return Response(":mailbox_with_mail:", delete_after=10)
 
         else:
             helpmsg = "**Commands**\n```"
@@ -754,9 +756,9 @@ class MusicBot(discord.Client):
 
             helpmsg += ", ".join(commands)
             helpmsg += "```"
-            helpmsg += "https://github.com/SexualRhinoceros/MusicBot/wiki/Commands-list"
-
-            return Response(helpmsg, reply=True, delete_after=60)
+            
+            await self.send_message(author, helpmsg)
+            return Response(":mailbox_with_mail:", delete_after=20)
 
     async def cmd_blacklist(self, message, user_mentions, option, something):
         """
